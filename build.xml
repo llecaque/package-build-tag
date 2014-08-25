@@ -1,0 +1,44 @@
+<project name="build tao tag" default="build" basedir=".">
+	<property file="../build.properties" />
+
+	<target name="help">
+		<echo msg ="Available Command : " />
+		<exec executable="phing" passthru="true">
+			<arg value="-l" />
+		</exec>
+	</target>
+
+	<target name="clean">
+		<delete dir="src" />
+		<delete dir="build" />
+	</target>
+	<target name="prepare">
+		<mkdir dir="src" />
+		<mkdir dir="build" />
+	</target>
+	<resolvepath propertyName="src.dir.resolved" file="src" />
+
+	<target name="clone" depends="clean,prepare"> 
+
+		<gitclone repository="git@github.com:llecaque/package-tao.git" targetPath="src" />
+
+
+		<composer command="install" composer="/usr/local/bin/composer">
+			 <arg value="--working-dir" />
+			 <arg path="${src.dir.resolved}" />
+		</composer>
+	</target>
+
+	<target name="package">
+		<zip destfile="build/${release.source.name}.zip">
+			<fileset dir="src">
+				<include name="**/**"/>
+				<exclude name="*/test/" />
+			</fileset>
+		</zip>
+
+	</target>
+	<target name="tag">
+
+	</target>
+</project>
