@@ -22,7 +22,7 @@
 	<target name="prepare">
 		<mkdir dir="src" />
 		<mkdir dir="build" />
-		<mkdir dir="backup" />
+		<mkdir dir="backupcd " />
 	</target>
 	<resolvepath propertyName="src.dir.resolved" file="src" />
 
@@ -119,4 +119,6 @@
 	<target name="restore_tao_package"> 
 		<copy file="backup/tao.json" tofile="src/composer.json" overwrite="true"/>
 	</target>
+
+	<target name="build" depends="clone,create_composer,package" />
 </project>
