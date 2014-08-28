@@ -1,6 +1,13 @@
 <project name="build tao tag" default="build" basedir=".">
 	<property file="../build.properties" />
-
+	<if>
+		<not>
+			<isset property="version" />
+		</not>
+		<then>
+			<echo level="error" msg="parma $version is needed" />
+		</then>
+	</if>
 	<target name="help">
 		<echo msg ="Available Command : " />
 		<exec executable="phing" passthru="true">
@@ -15,6 +22,7 @@
 	<target name="prepare">
 		<mkdir dir="src" />
 		<mkdir dir="build" />
+		<mkdir dir="backup" />
 	</target>
 	<resolvepath propertyName="src.dir.resolved" file="src" />
 
@@ -27,6 +35,7 @@
 			 <arg value="--working-dir" />
 			 <arg path="${src.dir.resolved}" />
 		</composer>
+		<copy file="src/composer.json" tofile="backup/tao.json" overwrite="true"/>
 	</target>
 
 	<target name="package">
@@ -38,7 +47,76 @@
 		</zip>
 
 	</target>
-	<target name="tag">
+	<property name="extensions_list" value="fake-tao" />
 
+	<target name="tag">
+		<foreach list="${extensions_list}" param="extension" target="tag_one" />
+	</target>
+
+	<target name="tag_one">
+		<tstamp>
+        	<format pattern="%H:%M:%S the %d/%m/%Y " property="build.time" />  
+		</tstamp>
+		<if>
+  			<isset property="extension"/>
+  			<then>
+				<echo msg="tag ext ${extension} with version v${version}" />
+				<gittag 
+					repository="${src.dir.resolved}/${extension}" 
+					name="v${version}" 
+					message="Automatic creation of tag ${version} at ${build.time}"/>
+				<gitpush
+        			repository="${src.dir.resolved}/${extension}"
+        			tags="true"
+        			destination="origin" />
+			</then>
+	  		<else>
+	  			<echo level="error" msg="error try to call tag_one alone" />
+	  		</else>
+	  	</if>
+	</target>
+
+
+	<target name="delete_tag">
+		<foreach list="${extensions_list}" param="extension" target="delete_tag_one" />
+	</target>
+
+
+	<target name="delete_tag_one">
+		<if>
+  			<isset property="extension"/>
+  			<then>
+		  		<echo msg="delete tag v${version for ext ${extension}" />
+		  		<gittag 
+		  			repository="${src.dir.resolved}/${extension}" 
+		  			name="v${version}" 
+		  			delete="true"/>
+		  		<exec 
+		  			command="git reset --hard" 
+		  			logoutput="true" 
+		  			passthru="true" 
+		  			dir="${src.dir.resolved}/${extension}" 
+		  		/>
+	  		</then>
+	  		<else>
+	  			<echo level="error" msg="error try to call delete_cd tag_one alone" />
+	  		</else>
+  		</if>
+		
+	</target>
+	<target name="create_composer" description="Create release controller">
+		<includepath classpath="task/composer" />
+		<taskdef name="composerCreate" classname="ComposerCreateTask" />
+		<move file="src/composer.json" tofile="src/tao.json" overwrite="true"/>
+		<composerCreate 
+			 composerTemplate="conf/composer.json"
+			 taoPackage="src/tao.json"
+			 outputDir="src"
+			 version="${version}"
+			/> 
+	</target>
+
+	<target name="restore_tao_package"> 
+		<copy file="backup/tao.json" tofile="src/composer.json" overwrite="true"/>
 	</target>
 </project>
