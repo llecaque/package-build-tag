@@ -39,7 +39,7 @@
 	</target>
 
 	<target name="package">
-		<zip destfile="build/${release.source.name}.zip">
+		<zip destfile="build/${release.source.name}.zip" prefix="${release.source.name}/">
 			<fileset dir="src">
 				<include name="**/**"/>
 				<exclude name="*/test/" />
@@ -47,10 +47,51 @@
 		</zip>
 
 	</target>
-	<property name="extensions_list" value="fake-tao" />
+	<property name="extensions_list" value="        
+		funcAcl,
+        generisHard,
+        ltiDeliveryProvider,
+        ontoBrowser,
+        tao,
+        taoCampaign,
+        taoCe,
+        taoDelivery,
+        taoDevTools,
+        taoGroups,
+        taoItems,
+        taoLti,
+        taoOpenWebItem,
+        taoQtiItem,
+        taoQtiTest,
+        taoResultServer,
+        taoResults,
+        taoSimpleDelivery,
+        taoSubjects,
+        taoTests,
+        taoWfAdvTest,
+        taoWfTest,
+        wfAuthoring,
+        wfEngine" />
 
 	<target name="tag">
 		<foreach list="${extensions_list}" param="extension" target="tag_one" />
+	</target>
+
+	<target name="remove_tests">
+		<foreach list="${extensions_list}" param="extension" target="remove_tests_one" />
+	</target>
+
+	<target name="remove_tests_one">
+		<if>
+  			<isset property="extension"/>
+  			<then>
+				<echo msg="remove test on ext ${extension}" />
+				<delete dir="src/${extension}/test" />
+			</then>
+			<else>
+	  			<echo level="error" msg="error try to call remove_tests_one alone" />
+	  		</else>
+	  	</if>
 	</target>
 
 	<target name="tag_one">
