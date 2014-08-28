@@ -22,7 +22,7 @@
 	<target name="prepare">
 		<mkdir dir="src" />
 		<mkdir dir="build" />
-		<mkdir dir="backupcd " />
+		<mkdir dir="backup" />
 	</target>
 	<resolvepath propertyName="src.dir.resolved" file="src" />
 
