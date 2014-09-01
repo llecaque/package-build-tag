@@ -50,6 +50,12 @@
     "computer-based-assessment"
   ],
   "replace" : 
-  		"{replace}"
-  
+  		"{replace}",
+
+   "extra": {
+   		"branch-alias": {
+			"dev-master": "2.3-dev",
+			"dev-develop": "2.4-dev"
+		}
+   }
 }

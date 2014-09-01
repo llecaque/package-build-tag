@@ -47,7 +47,7 @@
 		</zip>
 
 	</target>
-	<property name="extensions_list" value="        
+	<!--property name="extensions_list" value="        
 		funcAcl,
         generisHard,
         ltiDeliveryProvider,
@@ -71,8 +71,9 @@
         taoWfAdvTest,
         taoWfTest,
         wfAuthoring,
-        wfEngine" />
+        wfEngine" /-->
 
+    <property name="extensions_list" value="fake-tao" />
 	<target name="tag">
 		<foreach list="${extensions_list}" param="extension" target="tag_one" />
 	</target>
@@ -140,7 +141,7 @@
 		  		/>
 	  		</then>
 	  		<else>
-	  			<echo level="error" msg="error try to call delete_cd tag_one alone" />
+	  			<echo level="error" msg="error try to call delete_tag_one alone" />
 	  		</else>
   		</if>
 		
@@ -159,6 +160,27 @@
 
 	<target name="restore_tao_package"> 
 		<copy file="backup/tao.json" tofile="src/composer.json" overwrite="true"/>
+	</target>
+
+	<target name="re_create_develop_branches">
+		<foreach list="${extensions_list}" param="extension" target="re_create_develop_branches_one" />
+	</target>
+
+	<target name="re_create_develop_branches_one">
+		<if>
+  			<isset property="extension"/>
+  			<then>
+		  		<echo msg="create branch develop for ${src.dir.resolved}/${extension}" />
+
+		    	 <gitpush
+        			 repository="${src.dir.resolved}/${extension}"
+        			 refspec="master:develop"
+        			 destination="origin" />
+		    </then>
+		    <else>
+	  			<echo level="error" msg="error try to call re_create_develop_branches_one alone" />
+	  		</else>
+	  	</if>
 	</target>
 
 	<target name="build" depends="clone,create_composer,package" />
